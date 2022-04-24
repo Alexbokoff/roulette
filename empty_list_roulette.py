@@ -1,4 +1,4 @@
-list_number = []
+list_number = [1, 2, 3]
 while True:
     print()
     number = int(input('Введите число: '))
