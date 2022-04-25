@@ -7,7 +7,7 @@ while True:
     for i in range(len(list_number)):
         if i == len(list_number) - 1:
             continue
-        elif list_number[i] == number:
+        if list_number[i] == number:
             next_number_list.append(list_number[i + 1])
     list_number.append(number)
     duplicate = set(next_number_list)
@@ -20,3 +20,4 @@ while True:
         count_num = next_number_list.count(duplicate_list[num])
         percent = (count_num / len(next_number_list)) * 100
         print('Число -', duplicate_list[num], '(' + str(count_num), 'раз) -', round(percent, 2), '%')
+

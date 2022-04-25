@@ -28,8 +28,8 @@ from list import list_number
 
 while True:
     number = int(input('Введите число: '))
-    next_numbers = next_number_list(number, list_number)
     list_number.append(number)
+    next_numbers = next_number_list(number, list_number)
     duplicate_list = delete_duplicate_number(next_numbers)
     output_result(number, duplicate_list, next_numbers)
     print()
