@@ -1,23 +1,31 @@
-list_number = []
-while True:
-    print()
-    number = int(input('Введите число: '))
-    next_number_list = []
-
+def next_number_list(number, list_number):
+    next_numbers = []
     for i in range(len(list_number)):
         if i == len(list_number) - 1:
             continue
-        if list_number[i] == number:
-            next_number_list.append(list_number[i + 1])
-    list_number.append(number)
-    duplicate = set(next_number_list)
-    duplicate_list = []
+        elif list_number[i] == number:
+            next_numbers.append(list_number[i + 1])
+    return next_numbers
 
-    for i in duplicate:
-        duplicate_list.append(i)
+
+def delete_duplicate_number(next_numbers):
+    duplicate_list = list(set(next_numbers))
+    return duplicate_list
+
+
+def output_result(number, duplicate_list, next_numbers):
     print('После числа', number, 'выпадали:')
-    for num in range(len(duplicate_list)):
-        count_num = next_number_list.count(duplicate_list[num])
-        percent = (count_num / len(next_number_list)) * 100
-        print('Число -', duplicate_list[num], '(' + str(count_num), 'раз) -', round(percent, 2), '%')
+    for i in range(len(duplicate_list)):
+        count_num = next_numbers.count(duplicate_list[i])
+        percent = (count_num / len(next_numbers)) * 100
+        print('Число -', duplicate_list[i], '(' + str(count_num), 'раз) -', round(percent, 2), '%')
 
+
+list_number = []
+while True:
+    number = int(input('Введите число: '))
+    list_number.append(number)
+    next_numbers = next_number_list(number, list_number)
+    duplicate_list = delete_duplicate_number(next_numbers)
+    output_result(number, duplicate_list, next_numbers)
+    print()
