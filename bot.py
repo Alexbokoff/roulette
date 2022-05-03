@@ -5,14 +5,15 @@ from list import list_number
 
 bot = telebot.TeleBot(TOKEN, parse_mode='html')
 list_number = list_number
+number = 0
 
 
-def next_number_list(message, list_number):
+def next_number_list(number, list_number):
     next_numbers = []
     for i in range(len(list_number)):
         if i == len(list_number) - 1:
             continue
-        elif list_number[i] == int(message.text):
+        elif list_number[i] == number:
             next_numbers.append(list_number[i + 1])
     return next_numbers
 
@@ -36,8 +37,7 @@ def start(message):
     # '/list - напечатать текущий список чисел, по которым ведется статистика\n'
     # '/length - длина списка.\n\n'
                                       'Чтобы начать - жми комманду /go\n'
-                                      'Если бот в процессе работы зависнет, можно ввести эту же команду.',
-                     parse_mode='html')
+                                      'Если бот в процессе работы зависнет, можно ввести эту же команду.')
 
 
 @bot.message_handler(commands=['go'])
@@ -46,40 +46,46 @@ def go(message):
     bot.register_next_step_handler(message, main)
 
 
+markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+hidden_markup = types.ReplyKeyboardRemove()
+item_list = types.KeyboardButton('Список чисел')
+item_length = types.KeyboardButton('Длина списка')
+markup.add(item_list, item_length)
+
+
 def main(message):
+    global number
+    number = int(message.text)
     global list_number
-    list_number.append(int(message.text))
-    next_numbers = next_number_list(message, list_number)
+    answer_text = ''
+    list_number.append(number)
+    next_numbers = next_number_list(number, list_number)
     duplicate_list = delete_duplicate_number(next_numbers)
+
     bot.send_message(message.chat.id, 'После введеного числа выпадали:')
     for i in range(len(duplicate_list)):
         count_num = next_numbers.count(duplicate_list[i])
         percent = (count_num / len(next_numbers)) * 100
         percent = round(percent, 2)
-        bot.send_message(message.chat.id,
-                         'Число: ' + str(duplicate_list[i]) + ' ' + '(' + str(count_num) + 'раз) - ' + str(
-                             percent) + '%')
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    hideBoard = types.ReplyKeyboardRemove()
-    item_next = types.KeyboardButton('Продолжить')
-    item_list = types.KeyboardButton('Список чисел')
-    item_length = types.KeyboardButton('Длина списка')
-    markup.add(item_next, item_list, item_length)
-    bot.send_message(message.chat.id, 'Нажмите необходимую кнопку.', reply_markup=markup)
+        answer_text += 'Число ' + str(duplicate_list[i]) + ' ' + '(' + str(count_num) + 'раз) - ' + str(percent) + '%\n'
+        if i != len(duplicate_list) - 1:
+            continue
+        else:
+            bot.send_message(message.chat.id, answer_text, reply_markup=markup)
 
     @bot.message_handler(content_types=['text'])
     def next_step(message):
-        if message.text == 'Продолжить':
-            bot.send_message(message.chat.id, 'Введите следующее число', reply_markup=hideBoard)
-            bot.register_next_step_handler(message, main)
-        elif message.text == 'Список чисел':
-            bot.send_message(message.chat.id, f'Список: {list_number}', reply_markup=hideBoard)
-            bot.send_message(message.chat.id, 'Введите следующее число')
+        if message.text == 'Список чисел':
+            bot.send_message(message.chat.id, f'Список: {list_number}')
+            bot.send_message(message.chat.id, 'Введите следующее число', reply_markup=hidden_markup)
             bot.register_next_step_handler(message, main)
         elif message.text == 'Длина списка':
-            bot.send_message(message.chat.id, f'Длина списка: {len(list_number)}', reply_markup=hideBoard)
-            bot.send_message(message.chat.id, 'Введите следующее число')
+            bot.send_message(message.chat.id, f'Длина списка: {len(list_number)}')
+            bot.send_message(message.chat.id, 'Введите следующее число', reply_markup=hidden_markup)
             bot.register_next_step_handler(message, main)
+
+    bot.send_message(message.chat.id, 'Введите следующее число')
+    bot.register_next_step_handler(message, main)
 
 
 bot.infinity_polling()
