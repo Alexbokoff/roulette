@@ -84,7 +84,6 @@ def go(message):
 #     bot.send_message(message.chat.id, 'Введите следующее число:') #reply_markup=hidden_markup
 #     bot.register_next_step_handler(message, main)
 
-
 def main(message):
     global number
     number = int(message.text)
