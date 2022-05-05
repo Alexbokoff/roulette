@@ -1,10 +1,10 @@
 import telebot
 from telebot import types
-from config import TOKEN
-from list import list_number
+from config import TOKEN_test
+from list import list_number2
 
-bot = telebot.TeleBot(TOKEN, parse_mode='html')
-list_number = list_number
+bot = telebot.TeleBot(TOKEN_test, parse_mode='html')
+list_number = list_number2
 number = 0
 
 
@@ -23,8 +23,27 @@ def delete_duplicate_number(next_numbers):
     return duplicate_list
 
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_worker(call):
+    if call.data == 'next':
+        bot.send_message(call.message.chat.id, 'Введите следующее число:')
+        bot.register_next_step_handler(call.message, main)
+    elif call.data == 'list':
+        bot.send_message(call.message.chat.id, f'Список: {list_number}')
+        bot.send_message(call.message.chat.id, 'Введите следующее число:')
+        bot.register_next_step_handler(call.message, main)
+    elif call.data == 'length':
+        bot.send_message(call.message.chat.id, f'Длина списка: {len(list_number)}')
+        bot.send_message(call.message.chat.id, 'Введите следующее число:')
+        bot.register_next_step_handler(call.message, main)
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
+    keyboard = types.InlineKeyboardMarkup()
+    print_list = types.InlineKeyboardButton(text='Список чисел', callback_data='list')
+    length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
+    keyboard.add(print_list, length_list)
     bot.send_message(message.chat.id, 'Привет, я бот, который ведет статистику\n'
                                       'выпадения чисел в рулетке. Я показываю, какие числа\n'
                                       'и с какой вероятностью выпадают после введенного вами числа.\n\n'
@@ -37,7 +56,8 @@ def start(message):
     # '/list - напечатать текущий список чисел, по которым ведется статистика\n'
     # '/length - длина списка.\n\n'
                                       'Чтобы начать - жми комманду /go\n'
-                                      'Если бот в процессе работы зависнет, можно ввести эту же команду.')
+                                      'Если бот в процессе работы зависнет, можно ввести эту же команду.',
+                     reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['go'])
@@ -97,21 +117,6 @@ def main(message):
             else:
                 continue
     # bot.register_next_step_handler(message, main)
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):
-    if call.data == 'next':
-        bot.send_message(call.message.chat.id, 'Введите следующее число:')
-        bot.register_next_step_handler(call.message, main)
-    elif call.data == 'list':
-        bot.send_message(call.message.chat.id, f'Список: {list_number}')
-        bot.send_message(call.message.chat.id, 'Введите следующее число:')
-        bot.register_next_step_handler(call.message, main)
-    elif call.data == 'length':
-        bot.send_message(call.message.chat.id, f'Длина списка: {len(list_number)}')
-        bot.send_message(call.message.chat.id, 'Введите следующее число:')
-        bot.register_next_step_handler(call.message, main)
 
 
 bot.infinity_polling()
