@@ -29,56 +29,34 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, 'Введите следующее число:')
         bot.register_next_step_handler(call.message, main)
     elif call.data == 'list':
-        bot.send_message(call.message.chat.id, f'Список: {list_number}')
-        bot.send_message(call.message.chat.id, 'Введите следующее число:')
-        bot.register_next_step_handler(call.message, main)
+        keyboard = types.InlineKeyboardMarkup()
+        btn_go = types.InlineKeyboardButton(text='Начать работу', callback_data='go')
+        length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
+        keyboard.add(btn_go, length_list)
+        bot.send_message(call.message.chat.id, f'Список: {list_number}', reply_markup=keyboard)
     elif call.data == 'length':
-        bot.send_message(call.message.chat.id, f'Длина списка: {len(list_number)}')
-        bot.send_message(call.message.chat.id, 'Введите следующее число:')
+        keyboard = types.InlineKeyboardMarkup()
+        btn_go = types.InlineKeyboardButton(text='Начать работу', callback_data='go')
+        print_list = types.InlineKeyboardButton(text='Список чисел', callback_data='list')
+        keyboard.add(btn_go, print_list)
+        bot.send_message(call.message.chat.id, f'Длина списка: {len(list_number)}', reply_markup=keyboard)
+    elif call.data == 'go':
+        bot.send_message(call.message.chat.id, 'Я готов к работе. Введите число:')
         bot.register_next_step_handler(call.message, main)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
     keyboard = types.InlineKeyboardMarkup()
+    btn_go = types.InlineKeyboardButton(text='Начать работу', callback_data='go')
     print_list = types.InlineKeyboardButton(text='Список чисел', callback_data='list')
     length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
-    keyboard.add(print_list, length_list)
+    keyboard.add(btn_go, print_list, length_list)
     bot.send_message(message.chat.id, 'Привет, я бот, который ведет статистику\n'
-                                      'выпадения чисел в рулетке.\n\n'
-                                      'Я поддерживаю следующие команды:\n'
-                                      '/go - начало работы\n'
-    # '/help - помощь\n'
-    # '/list - напечатать текущий список чисел, по которым ведется статистика\n'
-    # '/length - длина списка.\n\n'
-                                      'Чтобы начать - жми комманду /go\n'
-                                      'Если бот в процессе работы зависнет, можно ввести эту же команду.',
-                     reply_markup=keyboard)
+                                      'выпадения чисел в рулетке.\n'
+                                      'В процессе работы выйти в главное меню: /start\n\n'
+                                      'Для начала работы, нажми необходимую кнопку ниже:\n', reply_markup=keyboard)
 
-
-@bot.message_handler(commands=['go'])
-def go(message):
-    bot.send_message(message.chat.id, 'Я готов к работе. Введите число:')
-    bot.register_next_step_handler(message, main)
-
-
-# markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-# hidden_markup = types.ReplyKeyboardRemove()
-# item_list = types.KeyboardButton('Список чисел')
-# item_length = types.KeyboardButton('Длина списка')
-# markup.add(item_list, item_length)
-
-# @bot.message_handler(func=lambda m: True)
-#     def next_step(message):
-#         if message.text == 'Список чисел':
-#             bot.send_message(message.chat.id, f'Список: {list_number}')
-#             bot.send_message(message.chat.id, 'Введите следующее число:') #reply_markup=hidden_markup
-#             bot.register_next_step_handler(message, main)
-#
-#     elif message.text == 'Длина списка':
-#     bot.send_message(message.chat.id, f'Длина списка: {len(list_number)}')
-#     bot.send_message(message.chat.id, 'Введите следующее число:') #reply_markup=hidden_markup
-#     bot.register_next_step_handler(message, main)
 
 def main(message):
     global number
@@ -108,10 +86,9 @@ def main(message):
                 print_list = types.InlineKeyboardButton(text='Список чисел', callback_data='list')
                 length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
                 keyboard.add(next_num, print_list, length_list)
-                bot.send_message(message.chat.id, answer_text, reply_markup=keyboard)  # reply_markup=markup
+                bot.send_message(message.chat.id, answer_text, reply_markup=keyboard)
             else:
                 continue
-    # bot.register_next_step_handler(message, main)
 
 
 bot.infinity_polling()
