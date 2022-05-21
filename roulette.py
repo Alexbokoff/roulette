@@ -1,4 +1,4 @@
-from list import list_number
+from list import list_number2
 
 def next_number_list(number, list_number):
     next_numbers = []
@@ -23,10 +23,16 @@ def output_result(number, duplicate_list, next_numbers):
         print('Число -', duplicate_list[i], '(' + str(count_num), 'раз) -', round(percent, 2), '%')
 
 
-list_number = list_number
+list_number = list_number2
 while True:
     number = int(input('Введите число: '))
     list_number.append(number)
+
+    add_number = str(list_number)
+    file = open('test_roul_list.txt', 'w')
+    file.write(add_number)
+    file.close()
+
     next_numbers = next_number_list(number, list_number)
     duplicate_list = delete_duplicate_number(next_numbers)
     output_result(number, duplicate_list, next_numbers)
