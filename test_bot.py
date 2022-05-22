@@ -61,8 +61,16 @@ def start(message):
 
 
 def main(message):
-    if message.text == 'Главное меню':
+    text = message.text.lower()
+    if text == 'главное меню':
         start(message)
+    elif text == 'start':
+        start(message)
+    elif text == 'go':
+        start(message)
+    elif not text.isdigit():
+        bot.send_message(message.chat.id, 'Данные должны быть числом, повторите ввод')
+        bot.register_next_step_handler(message, main)
     elif int(message.text) < 37 and int(message.text) >= 0:
         global number
         number = int(message.text)
@@ -98,7 +106,7 @@ def main(message):
                     bot.register_next_step_handler(message, main)
                 else:
                     continue
-    else:
+    elif int(message.text) > 36 or int(message.text) < 0:
         bot.send_message(message.chat.id, 'Неверное числовое значение, повторите ввод')
         bot.register_next_step_handler(message, main)
 
