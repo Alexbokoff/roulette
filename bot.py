@@ -1,10 +1,10 @@
 import telebot
 from telebot import types
-from config import TOKEN
-from list import list_number
+from config import TOKEN_test
+from list import list_number2
 
-bot = telebot.TeleBot(TOKEN, parse_mode='html')
-list_number = list_number
+bot = telebot.TeleBot(TOKEN_test, parse_mode='html')
+list_number = list_number2
 number = 0
 
 
@@ -61,8 +61,16 @@ def start(message):
 
 
 def main(message):
-    if message.text == 'Главное меню':
+    text = message.text.lower()
+    if text == 'главное меню':
         start(message)
+    elif text == 'start':
+        start(message)
+    elif text == 'go':
+        start(message)
+    elif not text.isdigit():
+        bot.send_message(message.chat.id, 'Данные должны быть числом, повторите ввод')
+        bot.register_next_step_handler(message, main)
     elif int(message.text) < 37 and int(message.text) >= 0:
         global number
         number = int(message.text)
@@ -71,7 +79,7 @@ def main(message):
         list_number.append(number)
 
         add_number_to_list = str(list_number)
-        file = open('list_number.txt', 'w')
+        file = open('list_number_test_bot.txt', 'w')
         file.write(add_number_to_list)
         file.close()
 
@@ -98,7 +106,7 @@ def main(message):
                     bot.register_next_step_handler(message, main)
                 else:
                     continue
-    else:
+    elif int(message.text) > 36 or int(message.text) < 0:
         bot.send_message(message.chat.id, 'Неверное числовое значение, повторите ввод')
         bot.register_next_step_handler(message, main)
 
