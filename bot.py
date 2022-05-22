@@ -25,21 +25,12 @@ def delete_duplicate_number(next_numbers):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
-    if call.data == 'list':
+    if call.data == 'length':
         keyboard = types.InlineKeyboardMarkup()
         btn_go = types.InlineKeyboardButton(text='Продолжить работу', callback_data='go')
-        length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
-        keyboard.add(btn_go, length_list)
-        bot.send_message(call.message.chat.id, f'Список: {list_number} \n\n'
-                                               f'Работа приостановлена, для продолжения нажмите необходимую кнопку ниже:',
-                         reply_markup=keyboard)
-    elif call.data == 'length':
-        keyboard = types.InlineKeyboardMarkup()
-        btn_go = types.InlineKeyboardButton(text='Продолжить работу', callback_data='go')
-        print_list = types.InlineKeyboardButton(text='Список чисел', callback_data='list')
-        keyboard.add(btn_go, print_list)
+        keyboard.add(btn_go)
         bot.send_message(call.message.chat.id, f'Длина списка: {len(list_number)}\n\n'
-                                               f'Работа приостановлена, для продолжения нажмите необходимую кнопку ниже:',
+                                               f'Работа приостановлена, для продолжения нажмите кнопку «Продолжить работу»',
                          reply_markup=keyboard)
     elif call.data == 'go':
         bot.send_message(call.message.chat.id, 'Я готов к работе. Введите число:')
@@ -50,14 +41,13 @@ def callback_worker(call):
 def start(message):
     keyboard = types.InlineKeyboardMarkup()
     btn_go = types.InlineKeyboardButton(text='Начать работу', callback_data='go')
-    print_list = types.InlineKeyboardButton(text='Список чисел', callback_data='list')
     length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
-    keyboard.add(btn_go, print_list, length_list)
+    keyboard.add(btn_go, length_list)
     bot.send_message(message.chat.id, 'Привет, я бот, который ведет статистику\n'
                                       'выпадения чисел в рулетке.\n'
                                       'Вы находитесь в главном меню.\n'
-                                      'Тут можно посмотреть список чисел, а также длинну списка\n\n'
-                                      'Для начала работы, нажми необходимую кнопку ниже:\n', reply_markup=keyboard)
+                                      'Можете посмотреть длинну списка или начать работу\n\n'
+                                      'Для начала, нажми необходимую кнопку ниже:\n', reply_markup=keyboard)
 
 
 def main(message):
@@ -65,8 +55,6 @@ def main(message):
     if text == 'главное меню':
         start(message)
     elif text == 'start':
-        start(message)
-    elif text == 'go':
         start(message)
     elif not text.isdigit():
         bot.send_message(message.chat.id, 'Данные должны быть числом, повторите ввод')
