@@ -1,10 +1,10 @@
 import telebot
 from telebot import types
-from config import TOKEN_test
-from list import list_number2
+from config import TOKEN
+from list import list_number
 
-bot = telebot.TeleBot(TOKEN_test, parse_mode='html')
-list_number = list_number2
+bot = telebot.TeleBot(TOKEN, parse_mode='html')
+list_number = list_number
 number = 0
 
 
@@ -79,7 +79,7 @@ def main(message):
         list_number.append(number)
 
         add_number_to_list = str(list_number)
-        file = open('list_number_test_bot.txt', 'w')
+        file = open('list_number.txt', 'w')
         file.write(add_number_to_list)
         file.close()
 
