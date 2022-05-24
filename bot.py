@@ -43,11 +43,11 @@ def start(message):
     btn_go = types.InlineKeyboardButton(text='Начать работу', callback_data='go')
     length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
     keyboard.add(btn_go, length_list)
-    bot.send_message(message.chat.id, 'Привет, я бот, который ведет статистику\n'
-                                      'выпадения чисел в рулетке.\n'
-                                      'Вы находитесь в главном меню.\n'
-                                      'Можете посмотреть длинну списка или начать работу\n\n'
-                                      'Для начала, нажми необходимую кнопку ниже:\n', reply_markup=keyboard)
+    bot.send_message(message.chat.id, 'Бот, который ведет статистику выпадения чисел в рулетке\n'
+                                      'Вы находитесь в главном меню.\n\n'
+                                      'Поддерживаемые команды:\n'
+                                      '/start - выход в главное меню\n'
+                                      'Для начала работы, нажми необходимую кнопку ниже:\n', reply_markup=keyboard)
 
 
 def main(message):
