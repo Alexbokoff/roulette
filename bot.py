@@ -1,11 +1,11 @@
 import telebot
 from telebot import types
+from operator import itemgetter
 from config import TOKEN
-from list import list_number
+from list_bot import list_number
 
 bot = telebot.TeleBot(TOKEN, parse_mode='html')
 list_number = list_number
-number = 0
 
 
 def next_number_list(number, list_number):
@@ -21,6 +21,48 @@ def next_number_list(number, list_number):
 def delete_duplicate_number(next_numbers):
     duplicate_list = list(set(next_numbers))
     return duplicate_list
+
+
+def what_is_number(duplicate_list):
+    odd_number = 0
+    even_number = 0
+    for number in duplicate_list:
+        if number % 2 == 1:
+            odd_number += 1
+        else:
+            even_number += 1
+    percent_odd = (odd_number / len(duplicate_list)) * 100
+    percent_even = (even_number / len(duplicate_list)) * 100
+    return percent_even, percent_odd
+
+
+def sorted_result(duplicate_list, next_numbers, percent_even, percent_odd):
+    answer_text = 'После введеного числа выпадали:\n'
+    summ_list = []
+    for i in range(len(duplicate_list)):
+        num_list = []
+        count_num = next_numbers.count(duplicate_list[i])
+        percent = (count_num / len(next_numbers)) * 100
+        percent = round(percent, 2)
+        num_list.append(duplicate_list[i])
+        num_list.append(count_num)
+        num_list.append(percent)
+        summ_list.append(num_list)
+
+    summ_list = sorted(summ_list, key=itemgetter(2), reverse=True)
+
+    for i_num in range(len(summ_list)):
+        answer_text += str(summ_list[i_num][0]) + ' - ' + '( ' + str(
+            summ_list[i_num][1]) + ' раз )__ ' + str(summ_list[i_num][2]) + '%\n'
+    answer_text += 'Четное: ' + str(round(percent_even, 2)) + '%, Нечетное: ' + str(round(percent_odd, 2)) + '%\n'
+    return answer_text
+
+
+def delete_last_number(message):
+    list_number.pop(-1)
+    bot.send_message(message.chat.id, 'Последнее число списка удалено.\n'
+                                      'Введите следующее число')
+    bot.register_next_step_handler(message, main)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -43,16 +85,18 @@ def start(message):
     btn_go = types.InlineKeyboardButton(text='Начать работу', callback_data='go')
     length_list = types.InlineKeyboardButton(text='Длина списка', callback_data='length')
     keyboard.add(btn_go, length_list)
-    bot.send_message(message.chat.id, 'Бот, который ведет статистику выпадения чисел в рулетке\n'
-                                      'Вы находитесь в главном меню.\n\n'
+    bot.send_message(message.chat.id, 'Вы находитесь в главном меню.\n\n'
                                       'Поддерживаемые команды:\n'
-                                      '/start - выход в главное меню\n'
+                                      'start - выход в главное меню\n'
+                                      'del - удаление последнего числа в списке\n\n'
                                       'Для начала работы, нажми необходимую кнопку ниже:\n', reply_markup=keyboard)
 
 
 def main(message):
     text = message.text.lower()
-    if text == 'главное меню':
+    if text == 'del':
+        delete_last_number(message)
+    elif text == 'главное меню':
         start(message)
     elif text == 'start':
         start(message)
@@ -63,11 +107,10 @@ def main(message):
         global number
         number = int(message.text)
         global list_number
-        answer_text = 'После введеного числа выпадали:\n'
         list_number.append(number)
 
         add_number_to_list = str(list_number)
-        file = open('list_number.txt', 'w')
+        file = open('list_bot.txt', 'w')
         file.write(add_number_to_list)
         file.close()
 
@@ -80,20 +123,16 @@ def main(message):
             bot.send_message(message.chat.id, 'Этого числа еще нет в статистике', reply_markup=keyboard)
             bot.register_next_step_handler(message, main)
         else:
-            for i in range(len(duplicate_list)):
-                count_num = next_numbers.count(duplicate_list[i])
-                percent = (count_num / len(next_numbers)) * 100
-                percent = round(percent, 2)
-                answer_text += 'Число ' + str(duplicate_list[i]) + ' ' + '(' + str(count_num) + 'раз) - ' + str(
-                    percent) + '%\n'
-                if i == len(duplicate_list) - 1:
-                    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-                    menu_btn = types.KeyboardButton('Главное меню')
-                    keyboard.add(menu_btn)
-                    bot.send_message(message.chat.id, answer_text, reply_markup=keyboard)
-                    bot.register_next_step_handler(message, main)
-                else:
-                    continue
+            percent_even, percent_odd = what_is_number(duplicate_list)
+            answer_text = sorted_result(duplicate_list, next_numbers, percent_even, percent_odd)
+
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            menu_btn = types.KeyboardButton('Главное меню')
+            keyboard.add(menu_btn)
+
+            bot.send_message(message.chat.id, answer_text, reply_markup=keyboard)
+            bot.register_next_step_handler(message, main)
+
     elif int(message.text) > 36 or int(message.text) < 0:
         bot.send_message(message.chat.id, 'Неверное числовое значение, повторите ввод')
         bot.register_next_step_handler(message, main)

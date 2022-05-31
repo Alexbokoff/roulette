@@ -1,9 +1,13 @@
 .idea
 __pycache__/config.cpython-38.pyc
+__pycache__/list_bot.cpython-38.pyc
+__pycache__/list_roulette.cpython-38.pyc
+__pycache__/list_test_bot.cpython-38.pyc
 config.py
-list_number.txt
-list_number_test_bot.txt
-test_roul_list.txt
-list.py
 test_bot.py
 roulette.py
+list_bot.py
+list_roulette.py
+list_test_bot.py
+list_bot.txt
+list_roulette.txt
